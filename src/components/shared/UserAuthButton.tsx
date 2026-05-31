@@ -6,7 +6,7 @@ import { useSession } from "@/components/providers/SessionProvider";
 import Link from "next/link";
 
 export function UserAuthButton() {
-    const { user, loading } = useSession();
+    const { user, loading, isAuthenticated } = useSession();
 
     if (loading) {
         return (
@@ -16,7 +16,9 @@ export function UserAuthButton() {
         );
     }
 
-    if (user) {
+    if (user && isAuthenticated) {
+        const fallbackInitial = (user.displayName || user.neupId || "U").charAt(0).toUpperCase();
+
         return (
             <Button
                 asChild
@@ -26,8 +28,8 @@ export function UserAuthButton() {
                 <Link href="/account">
                     <span className="text-sm font-medium">Get Inside</span>
                     <Avatar className="h-8 w-8">
-                        <AvatarImage src={user.photo} alt={user.username} />
-                        <AvatarFallback>{user.name.firstName.charAt(0)}</AvatarFallback>
+                        <AvatarImage src={user.displayImage} alt={user.displayName || user.neupId || "User"} />
+                        <AvatarFallback>{fallbackInitial}</AvatarFallback>
                     </Avatar>
                 </Link>
             </Button>

@@ -11,11 +11,9 @@ import { useTypewriter } from '@/hooks/useTypewriter';
 import { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { MobileNav } from './MobileNav';
-import { useAuthCheck } from '@/hooks/useAuthCheck';
 
 export function Header() {
   const pathname = usePathname();
-  const { isAuthenticated } = useAuthCheck();
   const [targetTitle, setTargetTitle] = useState('Neup.Group');
   const [headerLink, setHeaderLink] = useState('/');
   const [isLogoHovered, setIsLogoHovered] = useState(false);
@@ -110,8 +108,8 @@ export function Header() {
           <div className="hidden md:flex items-center space-x-2">
             <ThemeSwitcher />
             <Button asChild>
-              <Link href={isAuthenticated ? "/account" : "/account/about"}>
-                {isAuthenticated ? "Get Inside" : "Get Started"}
+              <Link href="/account">
+                Get Inside
               </Link>
             </Button>
           </div>

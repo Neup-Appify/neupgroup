@@ -9,7 +9,6 @@ import { NeupLogo } from '@/components/NeupLogo';
 import { ThemeSwitcher } from '../ThemeSwitcher';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { useAuthCheck } from '@/hooks/useAuthCheck';
 
 const navLinks = [
   { href: '/#ventures', label: 'Ventures' },
@@ -20,7 +19,6 @@ const navLinks = [
 
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
-  const { isAuthenticated } = useAuthCheck();
   const pathname = usePathname();
 
   // Close the mobile menu when the route changes
@@ -93,8 +91,8 @@ export function MobileNav() {
               transitionDelay: `${100 + navLinks.length * 50}ms`,
             }}
             size="lg" onClick={() => setIsOpen(false)}>
-            <Link href={isAuthenticated ? "/account" : "/account/about"}>
-              {isAuthenticated ? "Get Inside" : "Get Started"}
+            <Link href="/account">
+              Get Inside
             </Link>
           </Button>
         </div>

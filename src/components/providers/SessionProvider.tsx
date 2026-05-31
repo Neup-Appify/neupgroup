@@ -3,12 +3,16 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 export interface UserProfile {
-    name: {
-        firstName: string;
-        lastName: string;
-    };
-    username: string;
-    photo: string;
+    accountId: string;
+    neupId: string | null;
+    displayName: string | null;
+    displayImage: string;
+    accountType: "individual" | "guest" | string;
+    verified: boolean;
+}
+
+interface WhoisResponse extends UserProfile {
+    success: boolean;
 }
 
 interface SessionContextType {
@@ -21,40 +25,47 @@ interface SessionContextType {
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
 const SESSION_STORAGE_KEY = "neup_user_session";
+const WHOIS_ENDPOINT = "https://neupgroup.com/account/bridge/api.v1/auth/whoisthis";
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
 
+    const isSignedInUser = (profile: UserProfile | null) => {
+        return !!profile && profile.accountType !== "guest" && !!profile.neupId;
+    };
+
     const fetchSession = async () => {
         try {
             setLoading(true);
-            const response = await fetch(
-                "https://neupgroup.com/account/bridge/api/v1/profile/signed-info",
-                {
-                    credentials: "include",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
+            const response = await fetch(WHOIS_ENDPOINT, {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
 
             if (response.ok) {
-                const data = await response.json();
+                const data: WhoisResponse = await response.json();
 
-                if (data.error === "unauthenticated" || !data.username) {
-                    // User is not authenticated
-                    setUser(null);
-                    sessionStorage.removeItem(SESSION_STORAGE_KEY);
-                } else {
-                    // User is authenticated
+                if (data.success && data.accountId) {
                     const userProfile: UserProfile = {
-                        name: data.name,
-                        username: data.username,
-                        photo: data.photo,
+                        accountId: data.accountId,
+                        neupId: data.neupId,
+                        displayName: data.displayName,
+                        displayImage: data.displayImage,
+                        accountType: data.accountType,
+                        verified: data.verified,
                     };
                     setUser(userProfile);
-                    sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(userProfile));
+                    sessionStorage.setItem(
+                        SESSION_STORAGE_KEY,
+                        JSON.stringify(userProfile)
+                    );
+                } else {
+                    setUser(null);
+                    sessionStorage.removeItem(SESSION_STORAGE_KEY);
                 }
             } else {
                 setUser(null);
@@ -62,31 +73,26 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
             }
         } catch (error) {
             console.error("Failed to fetch session:", error);
-            // On error, we might want to keep the existing session or clear it.
-            // For safety, let's clear it if we can't verify.
-            // Or maybe we just don't update state if network fails?
-            // Let's fallback to clearing for now to be safe.
             setUser(null);
+            sessionStorage.removeItem(SESSION_STORAGE_KEY);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        // 1. Check Session Storage first for immediate visual feedback (if valid)
         const storedSession = sessionStorage.getItem(SESSION_STORAGE_KEY);
         if (storedSession) {
             try {
                 const parsed: UserProfile = JSON.parse(storedSession);
                 setUser(parsed);
-                setLoading(false); // We have data, so stop loading visually
+                setLoading(false);
             } catch (e) {
                 console.error("Error parsing session storage", e);
+                sessionStorage.removeItem(SESSION_STORAGE_KEY);
             }
         }
 
-        // 2. Always fetch fresh data to validate session and update storage
-        // This ensures that if the cookie expired, we catch it.
         fetchSession();
     }, []);
 
@@ -95,7 +101,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
             value={{
                 user,
                 loading,
-                isAuthenticated: !!user,
+                isAuthenticated: isSignedInUser(user),
                 refreshSession: fetchSession,
             }}
         >
