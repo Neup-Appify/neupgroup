@@ -1,0 +1,9 @@
+- [ ] Add or restore `documentation.guide.md`; the workspace does not currently contain it.
+- [ ] Add file-level documentation for `src/app/layout.tsx`.
+- [ ] Add file-level documentation for `src/app/page.tsx`.
+- [ ] Add file-level documentation for `src/app/manage/page.tsx`.
+- [ ] Add file-level documentation for `src/app/ledger/page.tsx`.
+- [ ] Add file-level documentation for `src/app/hr/page.tsx`.
+- [ ] Fix stale Next type generation references for `.next/types/app/account/page.ts` expecting `src/app/account/page.js`.
+- [ ] Fix `src/app/case/[slug]/page.tsx` page props typing so it satisfies Next's `PageProps` constraint.
+- [ ] Fix `src/components/ui/calendar.tsx` custom component typing for `IconLeft` and `IconRight`.
