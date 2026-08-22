@@ -5,5 +5,6 @@
 - [ ] Add file-level documentation for `src/app/ledger/page.tsx`.
 - [ ] Add file-level documentation for `src/app/hr/page.tsx`.
 - [ ] Fix stale Next type generation references for `.next/types/app/account/page.ts` expecting `src/app/account/page.js`.
+- [ ] Resolve `@genkit-ai/next@1.20.0` peer dependency mismatch after upgrading Next.js to 16.3.2; it currently expects `next ^15.0.0`.
 - [ ] Fix `src/app/case/[slug]/page.tsx` page props typing so it satisfies Next's `PageProps` constraint.
 - [ ] Fix `src/components/ui/calendar.tsx` custom component typing for `IconLeft` and `IconRight`.
