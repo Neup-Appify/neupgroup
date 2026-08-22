@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { NeupLogo } from '@/components/NeupLogo';
-import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import { ventures } from '@/components/sections/VenturePortfolio.config';
 import { useTypewriter } from '@/core/hooks/useTypewritter';
 import { useEffect, useState } from 'react';
@@ -47,7 +46,7 @@ export function Header() {
   const isHomePage = pathname === '/';
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-md">
+    <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 shadow-md backdrop-blur supports-[backdrop-filter]:bg-background/60 relative">
       <div className="container flex h-14 max-w-screen-2xl items-center justify-between">
         {/* Left Section: Logo */}
         <div className="flex items-center">
@@ -106,7 +105,6 @@ export function Header() {
         {/* Right Section: Actions */}
         <div className="flex items-center justify-end space-x-2">
           <div className="hidden md:flex items-center space-x-2">
-            <ThemeSwitcher />
             <Button asChild>
               <Link href="/account">
                 Get Inside

@@ -6,19 +6,10 @@ export const metadata: Metadata = {
   title: 'Our Team',
 };
 
-function getProjectId() {
-  return process.env.NEUPSITE_PROJECT_ID?.trim() || '';
-}
-
 async function getTeamMembers(): Promise<SitesMemberDirectoryItem[]> {
-  const projectId = getProjectId();
-
-  if (!projectId) {
-    return [];
-  }
 
   try {
-    const response = await logica.sites(projectId).members.get();
+    const response = await logica.sites().members.get();
     const members = response.body?.data;
 
     return Array.isArray(members) ? members : [];
