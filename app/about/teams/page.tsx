@@ -1,14 +1,38 @@
 import type { Metadata } from 'next';
+import { logica } from '@/logica';
+import type { SitesMemberDirectoryItem } from '@/logica/sites';
 
 export const metadata: Metadata = {
   title: 'Our Team',
 };
 
-export default function TeamsPage() {
+function getProjectId() {
+  return process.env.NEUPSITE_PROJECT_ID?.trim() || '';
+}
+
+async function getTeamMembers(): Promise<SitesMemberDirectoryItem[]> {
+  const projectId = getProjectId();
+
+  if (!projectId) {
+    return [];
+  }
+
+  try {
+    const response = await logica.sites(projectId).members.get();
+    const members = response.body?.data;
+
+    return Array.isArray(members) ? members : [];
+  } catch {
+    return [];
+  }
+}
+
+export default async function TeamsPage() {
+  const members = await getTeamMembers();
+
   return (
     <div className="flex flex-col min-h-screen">
       <main className="flex-1">
-        {/* Hero Section */}
         <section className="py-20 md:py-32 bg-card">
           <div className="container">
             <h1 className="font-headline text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter max-w-4xl">
@@ -20,60 +44,41 @@ export default function TeamsPage() {
           </div>
         </section>
 
-        {/* Team Grid Section */}
         <section className="py-20 md:py-28">
           <div className="container">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-
-              <div className="flex flex-col items-start text-left">
-                <div className="w-full aspect-square rounded-lg bg-primary/10 flex items-center justify-center">
-                  <img
-                    src="https://neupgroup.com/assets/members/neupkishor.png"
-                    alt="Kishor Neupane"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <h3 className="font-bold text-xl mt-4">Kishor Neupane</h3>
-                <p className="text-primary font-semibold">Founder</p>
+            {members.length > 0 ? (
+              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                {members.map((member) => (
+                  <div key={member.id} className="flex flex-col items-start text-left">
+                    <div className="w-full aspect-square overflow-hidden rounded-lg bg-primary/10 flex items-center justify-center">
+                      {member.displayImage ? (
+                        <img
+                          src={member.displayImage}
+                          alt={member.displayName}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-4xl font-bold text-primary/60">
+                          {(member.displayName || 'N').charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <h2 className="mt-4 text-xl font-bold">{member.displayName}</h2>
+                    <p className="font-semibold text-primary">{member.position}</p>
+                    {member.description ? (
+                      <p className="mt-2 text-sm text-muted-foreground">{member.description}</p>
+                    ) : null}
+                  </div>
+                ))}
               </div>
-
-              <div className="flex flex-col items-start text-left">
-                <div className="w-full aspect-square rounded-lg bg-primary/10 flex items-center justify-center">
-                  <img
-                    src="https://neupgroup.com/assets/members/khanalcwani.png"
-                    alt="Bhawani Khanal"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <h3 className="font-bold text-xl mt-4">Bhawani Khanal</h3>
-                <p className="text-primary font-semibold">Chief Executive Officer</p>
+            ) : (
+              <div className="rounded-lg border border-border/60 bg-card px-6 py-10 text-center">
+                <p className="text-lg font-semibold">Team information is unavailable right now.</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  This page now reads from the project member directory and will populate when member records are available.
+                </p>
               </div>
-
-              <div className="flex flex-col items-start text-left">
-                <div className="w-full aspect-square rounded-lg bg-primary/10 flex items-center justify-center">
-                  <img
-                    src="https://neupgroup.com/assets/members/sandeshshrestha.png"
-                    alt="Sandesh Shrestha"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <h3 className="font-bold text-xl mt-4">Sandesh Shrestha</h3>
-                <p className="text-primary font-semibold">Development Head</p>
-              </div>
-
-              <div className="flex flex-col items-start text-left">
-                <div className="w-full aspect-square rounded-lg bg-primary/10 flex items-center justify-center">
-                  <img
-                    src="https://neupgroup.com/assets/members/aakashpun.png"
-                    alt="Aakash Pun Magar"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <h3 className="font-bold text-xl mt-4">Aakash Pun Magar</h3>
-                <p className="text-primary font-semibold">Cybersecurity Head</p>
-              </div>
-
-            </div>
+            )}
           </div>
         </section>
       </main>
