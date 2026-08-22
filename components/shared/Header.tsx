@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { NeupLogo } from '@/components/NeupLogo';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import { ventures } from '@/components/sections/VenturePortfolio.config';
-import { useTypewriter } from '@/hooks/useTypewriter';
+import { useTypewriter } from '@/core/hooks/useTypewriter';
 import { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { MobileNav } from './MobileNav';
